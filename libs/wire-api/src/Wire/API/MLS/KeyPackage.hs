@@ -1,4 +1,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE OverloadedLabels #-}
+{-# LANGUAGE OverloadedRecordDot #-}
 
 -- This file is part of the Wire Server implementation.
 --
@@ -24,12 +26,6 @@ module Wire.API.MLS.KeyPackage
     KeyPackageCount (..),
     KeyPackageData (..),
     KeyPackage (..),
-    kpProtocolVersion,
-    kpCipherSuite,
-    kpInitKey,
-    kpCredential,
-    kpExtensions,
-    kpIdentity,
     kpRef,
     kpRef',
     KeyPackageTBS (..),
@@ -52,6 +48,7 @@ import Data.Json.Util
 import Data.Qualified
 import Data.Schema
 import qualified Data.Swagger as S
+import GHC.Records
 import Imports
 import Test.QuickCheck
 import Web.HttpApiData
@@ -163,7 +160,7 @@ kpRef cs =
 kpRef' :: RawMLS KeyPackage -> Maybe KeyPackageRef
 kpRef' kp =
   kpRef
-    <$> cipherSuiteTag (kpCipherSuite (rmValue kp))
+    <$> cipherSuiteTag (kp.rmValue.cipherSuite)
     <*> pure (KeyPackageData (rmRaw kp))
 
 --------------------------------------------------------------------------------
@@ -190,31 +187,31 @@ instance ParseMLS KeyPackageTBS where
       <*> parseMLSVector @VarInt parseMLS
 
 data KeyPackage = KeyPackage
-  { kpTBS :: RawMLS KeyPackageTBS,
-    kpSignature :: ByteString
+  { tbs :: RawMLS KeyPackageTBS,
+    signature_ :: ByteString
   }
   deriving stock (Eq, Show)
 
 instance S.ToSchema KeyPackage where
   declareNamedSchema _ = pure (mlsSwagger "KeyPackage")
 
-kpProtocolVersion :: KeyPackage -> ProtocolVersion
-kpProtocolVersion = protocolVersion . rmValue . kpTBS
+instance HasField "protocolVersion" KeyPackage ProtocolVersion where
+  getField = (.tbs.rmValue.protocolVersion)
 
-kpCipherSuite :: KeyPackage -> CipherSuite
-kpCipherSuite = cipherSuite . rmValue . kpTBS
+instance HasField "cipherSuite" KeyPackage CipherSuite where
+  getField = (.tbs.rmValue.cipherSuite)
 
-kpInitKey :: KeyPackage -> ByteString
-kpInitKey = unHPKEPublicKey . initKey . rmValue . kpTBS
+instance HasField "initKey" KeyPackage HPKEPublicKey where
+  getField = (.tbs.rmValue.initKey)
 
-kpCredential :: KeyPackage -> Credential
-kpCredential = credential . rmValue . kpTBS
+instance HasField "credential" KeyPackage Credential where
+  getField = (.tbs.rmValue.credential)
 
-kpExtensions :: KeyPackage -> [Extension]
-kpExtensions = extensions . rmValue . kpTBS
+instance HasField "extensions" KeyPackage [Extension] where
+  getField = (.tbs.rmValue.extensions)
 
-kpIdentity :: KeyPackage -> Either Text ClientIdentity
-kpIdentity = decodeMLS' @ClientIdentity . (\case (BasicCredential c) -> c) . kpCredential
+instance HasField "identity" KeyPackage (Either Text ClientIdentity) where
+  getField = decodeMLS' @ClientIdentity . (.credential.identityData)
 
 rawKeyPackageSchema :: ValueSchema NamedSwaggerDoc (RawMLS KeyPackage)
 rawKeyPackageSchema =

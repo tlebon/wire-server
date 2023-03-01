@@ -36,6 +36,7 @@ import Data.Schema
 import qualified Data.Swagger as S
 import qualified Data.Text as T
 import Data.UUID
+import GHC.Records
 import Imports
 import Web.HttpApiData
 import Wire.API.MLS.Serialisation
@@ -65,6 +66,9 @@ instance ParseMLS Credential where
 
 credentialTag :: Credential -> CredentialTag
 credentialTag BasicCredential {} = BasicCredentialTag
+
+instance HasField "identityData" Credential ByteString where
+  getField (BasicCredential i) = i
 
 data ClientIdentity = ClientIdentity
   { ciDomain :: Domain,
