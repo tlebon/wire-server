@@ -60,6 +60,7 @@ library
     Wire.API.MLS.Lifetime
     Wire.API.MLS.Message
     Wire.API.MLS.Proposal
+    Wire.API.MLS.ProposalTag
     Wire.API.MLS.ProtocolVersion
     Wire.API.MLS.PublicGroupState
     Wire.API.MLS.Serialisation

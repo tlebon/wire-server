@@ -15,32 +15,27 @@
 -- You should have received a copy of the GNU Affero General Public License along
 -- with this program. If not, see <https://www.gnu.org/licenses/>.
 
-module Wire.API.MLS.Capabilities where
+module Wire.API.MLS.ProposalTag where
 
+import Data.Binary
 import Imports
-import Test.QuickCheck
-import Wire.API.MLS.CipherSuite
-import Wire.API.MLS.Credential
-import Wire.API.MLS.ProposalTag
-import Wire.API.MLS.ProtocolVersion
 import Wire.API.MLS.Serialisation
 import Wire.Arbitrary
 
-data Capabilities = Capabilities
-  { versions :: [ProtocolVersion],
-    ciphersuites :: [CipherSuite],
-    extensions :: [Word16],
-    proposals :: [ProposalTag],
-    credentials :: [CredentialTag]
-  }
-  deriving (Show, Eq, Generic)
-  deriving (Arbitrary) via (GenericUniform Capabilities)
+data ProposalTag
+  = AddProposalTag
+  | UpdateProposalTag
+  | RemoveProposalTag
+  | PreSharedKeyProposalTag
+  | ReInitProposalTag
+  | ExternalInitProposalTag
+  | AppAckProposalTag
+  | GroupContextExtensionsProposalTag
+  deriving stock (Bounded, Enum, Eq, Generic, Show)
+  deriving (Arbitrary) via GenericUniform ProposalTag
 
-instance ParseMLS Capabilities where
-  parseMLS =
-    Capabilities
-      <$> parseMLSVector @VarInt parseMLS
-      <*> parseMLSVector @VarInt parseMLS
-      <*> parseMLSVector @VarInt parseMLS
-      <*> parseMLSVector @VarInt parseMLS
-      <*> parseMLSVector @VarInt parseMLS
+instance ParseMLS ProposalTag where
+  parseMLS = parseMLSEnum @Word16 "proposal type"
+
+instance SerialiseMLS ProposalTag where
+  serialiseMLS = serialiseMLSEnum @Word16

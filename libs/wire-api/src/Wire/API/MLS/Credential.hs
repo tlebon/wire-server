@@ -48,8 +48,10 @@ data Credential = BasicCredential ByteString
   deriving stock (Eq, Show, Generic)
   deriving (Arbitrary) via GenericUniform Credential
 
-data CredentialTag = BasicCredentialTag
-  deriving stock (Enum, Bounded, Eq, Show)
+data CredentialTag where
+  BasicCredentialTag :: CredentialTag
+  deriving stock (Enum, Bounded, Eq, Show, Generic)
+  deriving (Arbitrary) via (GenericUniform CredentialTag)
 
 instance ParseMLS CredentialTag where
   parseMLS = parseMLSEnum @Word16 "credential type"

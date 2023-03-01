@@ -1,3 +1,5 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+
 -- This file is part of the Wire Server implementation.
 --
 -- Copyright (C) 2022 Wire Swiss GmbH <opensource@wire.com>
@@ -18,9 +20,11 @@
 module Wire.API.MLS.HPKEPublicKey where
 
 import Imports
+import Test.QuickCheck
 import Wire.API.MLS.Serialisation
 
 newtype HPKEPublicKey = HPKEPublicKey {unHPKEPublicKey :: ByteString}
+  deriving (Show, Eq, Arbitrary)
 
 instance ParseMLS HPKEPublicKey where
   parseMLS = HPKEPublicKey <$> parseMLSBytes @VarInt

@@ -59,6 +59,9 @@ import Wire.API.MLS.CipherSuite
 import Wire.API.MLS.Context
 import Wire.API.MLS.Credential
 import Wire.API.MLS.Extension
+import Wire.API.MLS.HPKEPublicKey
+import Wire.API.MLS.LeafNode hiding (credential, extensions)
+import Wire.API.MLS.ProtocolVersion
 import Wire.API.MLS.Serialisation
 import Wire.Arbitrary
 
@@ -166,11 +169,12 @@ kpRef' kp =
 --------------------------------------------------------------------------------
 
 data KeyPackageTBS = KeyPackageTBS
-  { kpuProtocolVersion :: ProtocolVersion,
-    kpuCipherSuite :: CipherSuite,
-    kpuInitKey :: ByteString,
-    kpuCredential :: Credential,
-    kpuExtensions :: [Extension]
+  { protocolVersion :: ProtocolVersion,
+    cipherSuite :: CipherSuite,
+    initKey :: HPKEPublicKey,
+    leafNode :: LeafNode,
+    credential :: Credential,
+    extensions :: [Extension]
   }
   deriving stock (Eq, Show, Generic)
   deriving (Arbitrary) via GenericUniform KeyPackageTBS
@@ -180,9 +184,10 @@ instance ParseMLS KeyPackageTBS where
     KeyPackageTBS
       <$> parseMLS
       <*> parseMLS
-      <*> parseMLSBytes @Word16
       <*> parseMLS
-      <*> parseMLSVector @Word32 parseMLS
+      <*> parseMLS
+      <*> parseMLS
+      <*> parseMLSVector @VarInt parseMLS
 
 data KeyPackage = KeyPackage
   { kpTBS :: RawMLS KeyPackageTBS,
@@ -194,19 +199,19 @@ instance S.ToSchema KeyPackage where
   declareNamedSchema _ = pure (mlsSwagger "KeyPackage")
 
 kpProtocolVersion :: KeyPackage -> ProtocolVersion
-kpProtocolVersion = kpuProtocolVersion . rmValue . kpTBS
+kpProtocolVersion = protocolVersion . rmValue . kpTBS
 
 kpCipherSuite :: KeyPackage -> CipherSuite
-kpCipherSuite = kpuCipherSuite . rmValue . kpTBS
+kpCipherSuite = cipherSuite . rmValue . kpTBS
 
 kpInitKey :: KeyPackage -> ByteString
-kpInitKey = kpuInitKey . rmValue . kpTBS
+kpInitKey = unHPKEPublicKey . initKey . rmValue . kpTBS
 
 kpCredential :: KeyPackage -> Credential
-kpCredential = kpuCredential . rmValue . kpTBS
+kpCredential = credential . rmValue . kpTBS
 
 kpExtensions :: KeyPackage -> [Extension]
-kpExtensions = kpuExtensions . rmValue . kpTBS
+kpExtensions = extensions . rmValue . kpTBS
 
 kpIdentity :: KeyPackage -> Either Text ClientIdentity
 kpIdentity = decodeMLS' @ClientIdentity . (\case (BasicCredential c) -> c) . kpCredential

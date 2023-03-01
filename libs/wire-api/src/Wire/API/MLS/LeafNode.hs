@@ -18,6 +18,7 @@
 module Wire.API.MLS.LeafNode where
 
 import Imports
+import Test.QuickCheck
 import Wire.API.MLS.Capabilities
 import Wire.API.MLS.Credential
 import Wire.API.MLS.Extension
@@ -25,6 +26,7 @@ import Wire.API.MLS.HPKEPublicKey
 import Wire.API.MLS.Lifetime
 import Wire.API.MLS.Serialisation
 import Wire.API.MLS.SignaturePublicKey
+import Wire.Arbitrary
 
 data LeafNodeTBS = LeafNodeTBS
   { encryptionKey :: HPKEPublicKey,
@@ -34,7 +36,8 @@ data LeafNodeTBS = LeafNodeTBS
     leafNodeSource :: LeafNodeSource,
     extensions :: [Extension]
   }
-  deriving (Show, Eq)
+  deriving (Show, Eq, Generic)
+  deriving (Arbitrary) via (GenericUniform LeafNodeTBS)
 
 -- | This type can only verify the signature when the LeafNodeSource is
 -- LeafNodeSourceKeyPackage
@@ -42,11 +45,21 @@ data LeafNode = LeafNode
   { tbs :: LeafNodeTBS,
     signature_ :: ByteString
   }
+  deriving (Show, Eq, Generic)
+  deriving (Arbitrary) via (GenericUniform LeafNode)
+
+instance ParseMLS LeafNode where
+  parseMLS =
+    LeafNode
+      <$> (error "TODO")
+      <*> (error "TODO")
 
 data LeafNodeSource
   = LeafNodeSourceKeyPackage Lifetime
   | LeafNodeSourceUpdate
   | LeafNodeSourceCommit ByteString
+  deriving (Show, Eq, Generic)
+  deriving (Arbitrary) via (GenericUniform LeafNodeSource)
 
 instance ParseMLS LeafNodeSource where
   parseMLS =
