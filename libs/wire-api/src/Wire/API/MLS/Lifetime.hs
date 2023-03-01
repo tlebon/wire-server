@@ -1,7 +1,3 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE StandaloneKindSignatures #-}
-{-# LANGUAGE TemplateHaskell #-}
-
 -- This file is part of the Wire Server implementation.
 --
 -- Copyright (C) 2022 Wire Swiss GmbH <opensource@wire.com>
@@ -18,25 +14,29 @@
 --
 -- You should have received a copy of the GNU Affero General Public License along
 -- with this program. If not, see <https://www.gnu.org/licenses/>.
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
-module Wire.API.MLS.Extension where
+module Wire.API.MLS.Lifetime where
 
-import Data.Binary
+import Data.Time.Clock.POSIX
 import Imports
+import Test.QuickCheck
 import Wire.API.MLS.Serialisation
 import Wire.Arbitrary
 
-data Extension = Extension
-  { extType :: Word16,
-    extData :: ByteString
+-- | Seconds since the UNIX epoch.
+newtype Timestamp = Timestamp {timestampSeconds :: Word64}
+  deriving newtype (Eq, Show, Arbitrary, ParseMLS)
+
+tsPOSIX :: Timestamp -> POSIXTime
+tsPOSIX = fromIntegral . timestampSeconds
+
+data Lifetime = Lifetime
+  { ltNotBefore :: Timestamp,
+    ltNotAfter :: Timestamp
   }
   deriving stock (Eq, Show, Generic)
-  deriving (Arbitrary) via GenericUniform Extension
+  deriving (Arbitrary) via GenericUniform Lifetime
 
-instance ParseMLS Extension where
-  parseMLS = Extension <$> parseMLS <*> parseMLSBytes @VarInt
-
-instance SerialiseMLS Extension where
-  serialiseMLS (Extension ty d) = do
-    serialiseMLS ty
-    serialiseMLSBytes @Word32 d
+instance ParseMLS Lifetime where
+  parseMLS = Lifetime <$> parseMLS <*> parseMLS

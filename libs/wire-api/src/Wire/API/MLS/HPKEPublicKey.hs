@@ -1,7 +1,3 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE StandaloneKindSignatures #-}
-{-# LANGUAGE TemplateHaskell #-}
-
 -- This file is part of the Wire Server implementation.
 --
 -- Copyright (C) 2022 Wire Swiss GmbH <opensource@wire.com>
@@ -19,24 +15,12 @@
 -- You should have received a copy of the GNU Affero General Public License along
 -- with this program. If not, see <https://www.gnu.org/licenses/>.
 
-module Wire.API.MLS.Extension where
+module Wire.API.MLS.HPKEPublicKey where
 
-import Data.Binary
 import Imports
 import Wire.API.MLS.Serialisation
-import Wire.Arbitrary
 
-data Extension = Extension
-  { extType :: Word16,
-    extData :: ByteString
-  }
-  deriving stock (Eq, Show, Generic)
-  deriving (Arbitrary) via GenericUniform Extension
+newtype HPKEPublicKey = HPKEPublicKey {unHPKEPublicKey :: ByteString}
 
-instance ParseMLS Extension where
-  parseMLS = Extension <$> parseMLS <*> parseMLSBytes @VarInt
-
-instance SerialiseMLS Extension where
-  serialiseMLS (Extension ty d) = do
-    serialiseMLS ty
-    serialiseMLSBytes @Word32 d
+instance ParseMLS HPKEPublicKey where
+  parseMLS = HPKEPublicKey <$> parseMLSBytes @VarInt

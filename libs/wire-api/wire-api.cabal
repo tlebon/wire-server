@@ -43,6 +43,7 @@ library
     Wire.API.MakesFederatedCall
     Wire.API.Message
     Wire.API.Message.Proto
+    Wire.API.MLS.Capabilities
     Wire.API.MLS.CipherSuite
     Wire.API.MLS.Commit
     Wire.API.MLS.CommitBundle
@@ -52,13 +53,18 @@ library
     Wire.API.MLS.Extension
     Wire.API.MLS.Group
     Wire.API.MLS.GroupInfoBundle
+    Wire.API.MLS.HPKEPublicKey
     Wire.API.MLS.KeyPackage
     Wire.API.MLS.Keys
+    Wire.API.MLS.LeafNode
+    Wire.API.MLS.Lifetime
     Wire.API.MLS.Message
     Wire.API.MLS.Proposal
+    Wire.API.MLS.ProtocolVersion
     Wire.API.MLS.PublicGroupState
     Wire.API.MLS.Serialisation
     Wire.API.MLS.Servant
+    Wire.API.MLS.SignaturePublicKey
     Wire.API.MLS.SubConversation
     Wire.API.MLS.Welcome
     Wire.API.Notification

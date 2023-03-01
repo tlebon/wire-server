@@ -209,7 +209,7 @@ kpExtensions :: KeyPackage -> [Extension]
 kpExtensions = kpuExtensions . rmValue . kpTBS
 
 kpIdentity :: KeyPackage -> Either Text ClientIdentity
-kpIdentity = decodeMLS' @ClientIdentity . bcIdentity . kpCredential
+kpIdentity = decodeMLS' @ClientIdentity . (\case (BasicCredential c) -> c) . kpCredential
 
 rawKeyPackageSchema :: ValueSchema NamedSwaggerDoc (RawMLS KeyPackage)
 rawKeyPackageSchema =
