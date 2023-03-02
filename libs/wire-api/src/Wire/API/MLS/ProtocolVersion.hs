@@ -20,6 +20,8 @@ module Wire.API.MLS.ProtocolVersion
   ( ProtocolVersion (..),
     ProtocolVersionTag (..),
     pvTag,
+    protocolVersionFromTag,
+    defaultProtocolVersion,
   )
 where
 
@@ -41,3 +43,10 @@ pvTag (ProtocolVersion v) = case v of
   -- used by openmls
   200 -> pure ProtocolMLSDraft11
   _ -> Nothing
+
+protocolVersionFromTag :: ProtocolVersionTag -> ProtocolVersion
+protocolVersionFromTag ProtocolMLS10 = ProtocolVersion 1
+protocolVersionFromTag ProtocolMLSDraft11 = ProtocolVersion 200
+
+defaultProtocolVersion :: ProtocolVersion
+defaultProtocolVersion = protocolVersionFromTag ProtocolMLS10

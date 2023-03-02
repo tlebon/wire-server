@@ -54,7 +54,7 @@ import Wire.API.MLS.Context
 import Wire.API.MLS.Credential
 import Wire.API.MLS.Extension
 import Wire.API.MLS.HPKEPublicKey
-import Wire.API.MLS.LeafNode hiding (credential, extensions)
+import Wire.API.MLS.LeafNode
 import Wire.API.MLS.ProtocolVersion
 import Wire.API.MLS.Serialisation
 import Wire.Arbitrary

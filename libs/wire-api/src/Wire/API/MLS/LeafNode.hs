@@ -15,7 +15,11 @@
 -- You should have received a copy of the GNU Affero General Public License along
 -- with this program. If not, see <https://www.gnu.org/licenses/>.
 
-module Wire.API.MLS.LeafNode where
+module Wire.API.MLS.LeafNode
+  ( LeafIndex,
+    LeafNode (..),
+  )
+where
 
 import Imports
 import Test.QuickCheck
@@ -27,6 +31,8 @@ import Wire.API.MLS.Lifetime
 import Wire.API.MLS.Serialisation
 import Wire.API.MLS.SignaturePublicKey
 import Wire.Arbitrary
+
+type LeafIndex = Word32
 
 data LeafNodeTBS = LeafNodeTBS
   { encryptionKey :: HPKEPublicKey,
