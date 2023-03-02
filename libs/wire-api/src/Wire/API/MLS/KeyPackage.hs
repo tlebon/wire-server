@@ -1,7 +1,3 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE OverloadedLabels #-}
-{-# LANGUAGE OverloadedRecordDot #-}
-
 -- This file is part of the Wire Server implementation.
 --
 -- Copyright (C) 2022 Wire Swiss GmbH <opensource@wire.com>
@@ -26,6 +22,7 @@ module Wire.API.MLS.KeyPackage
     KeyPackageCount (..),
     KeyPackageData (..),
     KeyPackage (..),
+    keyPackageIdentity,
     kpRef,
     kpRef',
     KeyPackageTBS (..),
@@ -210,8 +207,8 @@ instance HasField "credential" KeyPackage Credential where
 instance HasField "extensions" KeyPackage [Extension] where
   getField = (.tbs.rmValue.extensions)
 
-instance HasField "identity" KeyPackage (Either Text ClientIdentity) where
-  getField = decodeMLS' @ClientIdentity . (.credential.identityData)
+keyPackageIdentity :: KeyPackage -> Either Text ClientIdentity
+keyPackageIdentity = decodeMLS' @ClientIdentity . (.credential.identityData)
 
 rawKeyPackageSchema :: ValueSchema NamedSwaggerDoc (RawMLS KeyPackage)
 rawKeyPackageSchema =
