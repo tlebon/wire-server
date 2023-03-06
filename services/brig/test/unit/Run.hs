@@ -1,5 +1,3 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-
 -- This file is part of the Wire Server implementation.
 --
 -- Copyright (C) 2022 Wire Swiss GmbH <opensource@wire.com>
@@ -17,14 +15,29 @@
 -- You should have received a copy of the GNU Affero General Public License along
 -- with this program. If not, see <https://www.gnu.org/licenses/>.
 
-module Wire.API.MLS.SignaturePublicKey where
+module Run
+  ( main,
+  )
+where
 
 import Imports
-import Test.QuickCheck (Arbitrary)
-import Wire.API.MLS.Serialisation
+import qualified Test.Brig.Calling
+import qualified Test.Brig.Calling.Internal
+import qualified Test.Brig.InternalNotification
+import qualified Test.Brig.MLS
+import qualified Test.Brig.Roundtrip
+import qualified Test.Brig.User.Search.Index.Types
+import Test.Tasty
 
-newtype SignaturePublicKey = SignaturePublicKey {unSignaturePublicKey :: ByteString}
-  deriving (Show, Eq, Arbitrary)
-
-instance ParseMLS SignaturePublicKey where
-  parseMLS = SignaturePublicKey <$> parseMLSBytes @VarInt
+main :: IO ()
+main =
+  defaultMain $
+    testGroup
+      "Tests"
+      [ Test.Brig.User.Search.Index.Types.tests,
+        Test.Brig.Calling.tests,
+        Test.Brig.Calling.Internal.tests,
+        Test.Brig.Roundtrip.tests,
+        Test.Brig.MLS.tests,
+        Test.Brig.InternalNotification.tests
+      ]

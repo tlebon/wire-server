@@ -207,6 +207,9 @@ instance HasField "credential" KeyPackage Credential where
 instance HasField "extensions" KeyPackage [Extension] where
   getField = (.tbs.rmValue.extensions)
 
+instance HasField "leafNode" KeyPackage LeafNode where
+  getField = (.tbs.rmValue.leafNode)
+
 keyPackageIdentity :: KeyPackage -> Either Text ClientIdentity
 keyPackageIdentity = decodeMLS' @ClientIdentity . (.credential.identityData)
 

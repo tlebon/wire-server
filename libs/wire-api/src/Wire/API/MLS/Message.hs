@@ -21,9 +21,12 @@
 module Wire.API.MLS.Message
   ( -- * MLS Message types
     Message (..),
+    MessageContent (..),
     PublicMessage (..),
     PrivateMessage (..),
     FramedContent (..),
+    FramedContentData (..),
+    FramedContentDataTag (..),
     FramedContentTBS (..),
     FramedContentAuthData (..),
     Sender (..),
@@ -33,7 +36,7 @@ module Wire.API.MLS.Message
     mkSignedMessage,
 
     -- * Servant types
-    MLSMessageSendingStatus,
+    MLSMessageSendingStatus (..),
   )
 where
 
@@ -83,20 +86,20 @@ data Message = Message
 instance ParseMLS Message where
   parseMLS = Message <$> parseMLS <*> parseMLS
 
-messageSignature :: Message -> Maybe ByteString
-messageSignature msg = case msg.content of
-  MessagePublic pubMsg -> Just pubMsg.authData.signature_
-  _ -> Nothing
+instance SerialiseMLS Message where
+  serialiseMLS msg = do
+    serialiseMLS msg.protocolVersion
+    serialiseMLS msg.content
 
 instance HasField "wireFormat" Message WireFormatTag where
   getField = (.content.wireFormat)
 
 data MessageContent
-  = MessagePrivate PrivateMessage
+  = MessagePrivate (RawMLS PrivateMessage)
   | MessagePublic PublicMessage
   | MessageWelcome Welcome
-  | MessageGroupInfo
-  | MessageKeyPackage KeyPackage
+  | MessageGroupInfo -- TODO
+  | MessageKeyPackage (RawMLS KeyPackage)
   deriving (Eq, Show)
 
 instance HasField "wireFormat" MessageContent WireFormatTag where
@@ -114,6 +117,24 @@ instance ParseMLS MessageContent where
       WireFormatWelcomeTag -> MessageWelcome <$> parseMLS
       WireFormatGroupInfoTag -> pure MessageGroupInfo
       WireFormatKeyPackageTag -> MessageKeyPackage <$> parseMLS
+
+instance SerialiseMLS MessageContent where
+  serialiseMLS (MessagePrivate msg) = do
+    serialiseMLS WireFormatPrivateTag
+    serialiseMLS msg
+  serialiseMLS (MessagePublic msg) = do
+    serialiseMLS WireFormatPublicTag
+    serialiseMLS msg
+  serialiseMLS (MessageWelcome welcome) = do
+    serialiseMLS WireFormatWelcomeTag
+    serialiseMLS welcome
+  serialiseMLS MessageGroupInfo = do
+    serialiseMLS WireFormatGroupInfoTag
+    -- TODO
+    pure ()
+  serialiseMLS (MessageKeyPackage kp) = do
+    serialiseMLS WireFormatKeyPackageTag
+    serialiseMLS kp
 
 instance S.ToSchema Message where
   declareNamedSchema _ = pure (mlsSwagger "MLSMessage")
@@ -139,10 +160,16 @@ instance ParseMLS PublicMessage where
           membershipTag = membershipTag
         }
 
+instance SerialiseMLS PublicMessage where
+  serialiseMLS msg = do
+    serialiseMLS msg.content
+    serialiseMLS msg.authData
+    traverse_ (serialiseMLSBytes @VarInt) msg.membershipTag
+
 data PrivateMessage = PrivateMessage
   { groupId :: GroupId,
     epoch :: Epoch,
-    tag :: WireFormatTag,
+    tag :: FramedContentDataTag,
     authenticatedData :: ByteString,
     encryptedSenderData :: ByteString,
     ciphertext :: ByteString
@@ -234,7 +261,7 @@ data FramedContentDataTag
   = FramedContentApplicationDataTag
   | FramedContentProposalTag
   | FramedContentCommitTag
-  deriving (Enum, Bounded, Eq, Ord)
+  deriving (Enum, Bounded, Eq, Ord, Show)
 
 instance ParseMLS FramedContentDataTag where
   parseMLS = parseMLSEnum @Word8 "ContentType"
@@ -287,17 +314,14 @@ instance SerialiseMLS FramedContentTBS where
     serialiseMLS tbs.content
     traverse_ serialiseMLS tbs.groupContext
 
-mkFramedContentTBS :: RawMLS GroupContext -> Message -> Maybe FramedContentTBS
-mkFramedContentTBS ctx msg = case msg.content of
-  MessagePublic pubMsg ->
-    Just
-      FramedContentTBS
-        { protocolVersion = msg.protocolVersion,
-          wireFormat = msg.wireFormat,
-          content = pubMsg.content,
-          groupContext = guard (needsGroupContext pubMsg.content.rmValue.sender) $> ctx
-        }
-  _ -> Nothing
+framedContentTBS :: RawMLS GroupContext -> RawMLS FramedContent -> FramedContentTBS
+framedContentTBS ctx msgContent =
+  FramedContentTBS
+    { protocolVersion = defaultProtocolVersion,
+      wireFormat = WireFormatPublicTag,
+      content = msgContent,
+      groupContext = guard (needsGroupContext msgContent.rmValue.sender) $> ctx
+    }
 
 data FramedContentAuthData = FramedContentAuthData
   { signature_ :: ByteString,
@@ -312,6 +336,11 @@ parseFramedContentAuthData tag = do
     FramedContentCommitTag -> Just <$> parseMLSBytes @VarInt
     _ -> pure Nothing
   pure (FramedContentAuthData sig confirmationTag)
+
+instance SerialiseMLS FramedContentAuthData where
+  serialiseMLS ad = do
+    serialiseMLSBytes @VarInt ad.signature_
+    traverse_ (serialiseMLSBytes @VarInt) ad.confirmationTag
 
 data GroupContext = GroupContext
   { protocolVersion :: ProtocolVersion,
@@ -356,10 +385,15 @@ mkSignedMessage priv pub gid epoch payload =
                 }
         }
 
-verifyMessageSignature :: RawMLS GroupContext -> Message -> ByteString -> Bool
-verifyMessageSignature ctx msg pubkey = isJust $ do
-  tbs <- encodeMLS' <$> mkFramedContentTBS ctx msg
-  sig <- messageSignature msg
+verifyMessageSignature ::
+  RawMLS GroupContext ->
+  RawMLS FramedContent ->
+  FramedContentAuthData ->
+  ByteString ->
+  Bool
+verifyMessageSignature ctx msgContent authData pubkey = isJust $ do
+  let tbs = encodeMLS' (framedContentTBS ctx msgContent)
+      sig = authData.signature_
   cs <- cipherSuiteTag ctx.rmValue.cipherSuite
   guard $ csVerifySignature cs pubkey tbs sig
 

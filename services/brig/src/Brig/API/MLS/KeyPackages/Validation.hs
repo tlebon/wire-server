@@ -41,10 +41,14 @@ import Data.Time.Clock.POSIX
 import Imports
 import Wire.API.Error
 import Wire.API.Error.Brig
+import Wire.API.MLS.Capabilities
 import Wire.API.MLS.CipherSuite
 import Wire.API.MLS.Credential
 import Wire.API.MLS.Extension
 import Wire.API.MLS.KeyPackage
+import Wire.API.MLS.LeafNode
+import Wire.API.MLS.Lifetime
+import Wire.API.MLS.ProtocolVersion
 import Wire.API.MLS.Serialisation
 
 validateKeyPackage ::
@@ -58,12 +62,9 @@ validateKeyPackage identity (RawMLS (KeyPackageData -> kpd) kp) = do
     maybe
       (mlsProtocolError "Unsupported ciphersuite")
       pure
-      $ cipherSuiteTag (kpCipherSuite kp)
+      $ cipherSuiteTag kp.cipherSuite
 
-  -- validate signature scheme
   let ss = csSignatureScheme cs
-  when (signatureScheme ss /= bcSignatureScheme (kpCredential kp)) $
-    mlsProtocolError "Signature scheme incompatible with ciphersuite"
 
   -- Authenticate signature key. This is performed only upon uploading a key
   -- package for a local client.
@@ -76,7 +77,7 @@ validateKeyPackage identity (RawMLS (KeyPackageData -> kpd) kp) = do
               (mlsProtocolError "No key associated to the given identity and signature scheme")
               pure
               =<< lift (wrapClient (Data.lookupMLSPublicKey (ciUser identity) (ciClient identity) ss))
-        when (key /= bcSignatureKey (kpCredential kp)) $
+        when (key /= kp.leafNode.signatureKey) $
           mlsProtocolError "Unrecognised signature key"
     )
     (pure . const ())
@@ -86,20 +87,22 @@ validateKeyPackage identity (RawMLS (KeyPackageData -> kpd) kp) = do
   unless
     ( csVerifySignature
         cs
-        (bcSignatureKey (kpCredential kp))
-        (rmRaw (kpTBS kp))
-        (kpSignature kp)
+        kp.leafNode.signatureKey
+        kp.tbs.rmRaw
+        kp.signature_
     )
     $ mlsProtocolError "Invalid signature"
   -- validate protocol version
   maybe
     (mlsProtocolError "Unsupported protocol version")
     pure
-    (pvTag (kpProtocolVersion kp) >>= guard . (== ProtocolMLS10))
-  -- validate credential
-  validateCredential identity (kpCredential kp)
-  -- validate extensions
-  validateExtensions (kpExtensions kp)
+    (kp.protocolVersion.tag >>= guard . (== ProtocolMLS10))
+
+  -- validate credential, lifetime and capabilities
+  validateCredential identity kp.credential
+  validateLifetime kp
+  validateCapabilities kp.leafNode.capabilities
+
   pure (kpRef cs kpd, kpd)
 
 validateCredential :: ClientIdentity -> Credential -> Handler r ()
@@ -113,39 +116,6 @@ validateCredential identity cred = do
     credentialError e =
       mlsProtocolError $
         "Failed to parse identity: " <> e
-
-data RequiredExtensions f = RequiredExtensions
-  { reLifetime :: f Lifetime,
-    reCapabilities :: f ()
-  }
-
-deriving instance (Show (f Lifetime), Show (f ())) => Show (RequiredExtensions f)
-
-instance Alternative f => Semigroup (RequiredExtensions f) where
-  RequiredExtensions lt1 cap1 <> RequiredExtensions lt2 cap2 =
-    RequiredExtensions (lt1 <|> lt2) (cap1 <|> cap2)
-
-instance Alternative f => Monoid (RequiredExtensions f) where
-  mempty = RequiredExtensions empty empty
-
-checkRequiredExtensions :: RequiredExtensions Maybe -> Either Text (RequiredExtensions Identity)
-checkRequiredExtensions re =
-  RequiredExtensions
-    <$> maybe (Left "Missing lifetime extension") (pure . Identity) (reLifetime re)
-    <*> maybe (Left "Missing capability extension") (pure . Identity) (reCapabilities re)
-
-findExtensions :: [Extension] -> Either Text (RequiredExtensions Identity)
-findExtensions = checkRequiredExtensions <=< (getAp . foldMap findExtension)
-
-findExtension :: Extension -> Ap (Either Text) (RequiredExtensions Maybe)
-findExtension ext = (Ap (decodeExtension ext) >>=) . foldMap $ \case
-  (SomeExtension SLifetimeExtensionTag lt) -> pure $ RequiredExtensions (Just lt) Nothing
-  (SomeExtension SCapabilitiesExtensionTag _) -> pure $ RequiredExtensions Nothing (Just ())
-
-validateExtensions :: [Extension] -> Handler r ()
-validateExtensions exts = do
-  re <- either mlsProtocolError pure $ findExtensions exts
-  validateLifetime . runIdentity . reLifetime $ re
 
 validateLifetime :: Lifetime -> Handler r ()
 validateLifetime lt = do
@@ -163,6 +133,9 @@ validateLifetime' now mMaxLifetime lt = do
   for_ mMaxLifetime $ \maxLifetime ->
     when (tsPOSIX (ltNotAfter lt) > now + maxLifetime) $
       Left "Key package expiration time is too far in the future"
+
+validateCapabilities :: Capabilities -> Handler r ()
+validateCapabilities _ = pure ()
 
 mlsProtocolError :: Text -> Handler r a
 mlsProtocolError msg =

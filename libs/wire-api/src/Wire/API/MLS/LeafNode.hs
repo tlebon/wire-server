@@ -21,6 +21,7 @@ module Wire.API.MLS.LeafNode
   )
 where
 
+import GHC.Records
 import Imports
 import Test.QuickCheck
 import Wire.API.MLS.Capabilities
@@ -29,14 +30,13 @@ import Wire.API.MLS.Extension
 import Wire.API.MLS.HPKEPublicKey
 import Wire.API.MLS.Lifetime
 import Wire.API.MLS.Serialisation
-import Wire.API.MLS.SignaturePublicKey
 import Wire.Arbitrary
 
 type LeafIndex = Word32
 
 data LeafNodeTBS = LeafNodeTBS
   { encryptionKey :: HPKEPublicKey,
-    signatureKey :: SignaturePublicKey,
+    signatureKey :: ByteString,
     credential :: Credential,
     capabilities :: Capabilities,
     leafNodeSource :: LeafNodeSource,
@@ -44,6 +44,16 @@ data LeafNodeTBS = LeafNodeTBS
   }
   deriving (Show, Eq, Generic)
   deriving (Arbitrary) via (GenericUniform LeafNodeTBS)
+
+instance ParseMLS LeafNodeTBS where
+  parseMLS =
+    LeafNodeTBS
+      <$> parseMLS
+      <*> parseMLSBytes @VarInt
+      <*> parseMLS
+      <*> parseMLS
+      <*> parseMLS
+      <*> parseMLSVector @VarInt parseMLS
 
 -- | This type can only verify the signature when the LeafNodeSource is
 -- LeafNodeSourceKeyPackage
@@ -57,8 +67,26 @@ data LeafNode = LeafNode
 instance ParseMLS LeafNode where
   parseMLS =
     LeafNode
-      <$> (error "TODO")
-      <*> (error "TODO")
+      <$> parseMLS
+      <*> parseMLSBytes @VarInt
+
+instance HasField "encryptionKey" LeafNode HPKEPublicKey where
+  getField = (.tbs.encryptionKey)
+
+instance HasField "signatureKey" LeafNode ByteString where
+  getField = (.tbs.signatureKey)
+
+instance HasField "credential" LeafNode Credential where
+  getField = (.tbs.credential)
+
+instance HasField "capabilities" LeafNode Capabilities where
+  getField = (.tbs.capabilities)
+
+instance HasField "leafNodeSource" LeafNode LeafNodeSource where
+  getField = (.tbs.leafNodeSource)
+
+instance HasField "extensions" LeafNode [Extension] where
+  getField = (.tbs.extensions)
 
 data LeafNodeSource
   = LeafNodeSourceKeyPackage Lifetime
