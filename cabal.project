@@ -1,7 +1,8 @@
 with-compiler: ghc-9.2.4
 
 packages:
-    libs/api-bot/
+    integration
+  , libs/api-bot/
   , libs/api-client/
   , libs/bilge/
   , libs/brig-types/
