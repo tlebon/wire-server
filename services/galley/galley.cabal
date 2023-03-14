@@ -339,8 +339,8 @@ executable galley
   default-language: Haskell2010
 
 executable galley-integration
-  import:           common-all
-  main-is:          ../integration.hs
+  import:         common-all
+  main-is:        ../integration.hs
 
   -- cabal-fmt: expand test/integration
   other-modules:
@@ -365,7 +365,8 @@ executable galley-integration
     TestHelpers
     TestSetup
 
-  ghc-options:      -threaded -with-rtsopts=-N -rtsopts
+  ghc-options:    -threaded -with-rtsopts=-N -rtsopts
+  hs-source-dirs: test/integration
   build-depends:
     , aeson
     , aeson-qq
@@ -473,18 +474,16 @@ executable galley-integration
     , wire-message-proto-lens
     , yaml
 
-  default-language: Haskell2010
-
 executable galley-migrate-data
   import:           common-all
-  main-is:          Main.hs
+  main-is:          ../main.hs
 
   -- cabal-fmt: expand migrate-data/src
   other-modules:
     Galley.DataMigration
     Galley.DataMigration.Types
-    Main
     Paths_galley
+    Run
     V1_BackfillBillingTeamMembers
     V2_MigrateMLSMembers
 
@@ -622,9 +621,10 @@ executable galley-schema
 test-suite galley-tests
   import:           common-all
   type:             exitcode-stdio-1.0
-  main-is:          Main.hs
+  main-is:          ../unit.hs
   other-modules:
     Paths_galley
+    Run
     Test.Galley.API
     Test.Galley.API.Message
     Test.Galley.API.One2One
@@ -632,6 +632,7 @@ test-suite galley-tests
     Test.Galley.Mapping
 
   ghc-options:      -threaded -with-rtsopts=-N
+  hs-source-dirs:   test/unit
   build-depends:
     , base
     , case-insensitive
