@@ -18,11 +18,7 @@
 module Brig.API.MLS.KeyPackages.Validation
   ( -- * Main key package validation function
     validateKeyPackage,
-    reLifetime,
     mlsProtocolError,
-
-    -- * Exported for unit tests
-    findExtensions,
     validateLifetime',
   )
 where
@@ -44,7 +40,6 @@ import Wire.API.Error.Brig
 import Wire.API.MLS.Capabilities
 import Wire.API.MLS.CipherSuite
 import Wire.API.MLS.Credential
-import Wire.API.MLS.Extension
 import Wire.API.MLS.KeyPackage
 import Wire.API.MLS.LeafNode
 import Wire.API.MLS.Lifetime
@@ -96,26 +91,34 @@ validateKeyPackage identity (RawMLS (KeyPackageData -> kpd) kp) = do
   maybe
     (mlsProtocolError "Unsupported protocol version")
     pure
-    (kp.protocolVersion.tag >>= guard . (== ProtocolMLS10))
+    (pvTag (kp.protocolVersion) >>= guard . (== ProtocolMLS10))
 
   -- validate credential, lifetime and capabilities
   validateCredential identity kp.credential
-  validateLifetime kp
+  validateSource kp.leafNode.source
   validateCapabilities kp.leafNode.capabilities
 
   pure (kpRef cs kpd, kpd)
 
 validateCredential :: ClientIdentity -> Credential -> Handler r ()
-validateCredential identity cred = do
+validateCredential identity (BasicCredential cred) = do
   identity' <-
     either credentialError pure $
-      decodeMLS' (bcIdentity cred)
+      decodeMLS' cred
   when (identity /= identity') $
     throwStd (errorToWai @'MLSIdentityMismatch)
   where
     credentialError e =
       mlsProtocolError $
         "Failed to parse identity: " <> e
+
+validateSource :: LeafNodeSource -> Handler r ()
+validateSource (LeafNodeSourceKeyPackage lt) = validateLifetime lt
+validateSource s =
+  mlsProtocolError $
+    "Expected 'key_package' source, got '"
+      <> (leafNodeSourceTag s).name
+      <> "'"
 
 validateLifetime :: Lifetime -> Handler r ()
 validateLifetime lt = do

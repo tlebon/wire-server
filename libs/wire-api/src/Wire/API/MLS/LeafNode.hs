@@ -18,6 +18,9 @@
 module Wire.API.MLS.LeafNode
   ( LeafIndex,
     LeafNode (..),
+    LeafNodeSource (..),
+    LeafNodeSourceTag (..),
+    leafNodeSourceTag,
   )
 where
 
@@ -39,7 +42,7 @@ data LeafNodeTBS = LeafNodeTBS
     signatureKey :: ByteString,
     credential :: Credential,
     capabilities :: Capabilities,
-    leafNodeSource :: LeafNodeSource,
+    source :: LeafNodeSource,
     extensions :: [Extension]
   }
   deriving (Show, Eq, Generic)
@@ -82,8 +85,8 @@ instance HasField "credential" LeafNode Credential where
 instance HasField "capabilities" LeafNode Capabilities where
   getField = (.tbs.capabilities)
 
-instance HasField "leafNodeSource" LeafNode LeafNodeSource where
-  getField = (.tbs.leafNodeSource)
+instance HasField "source" LeafNode LeafNodeSource where
+  getField = (.tbs.source)
 
 instance HasField "extensions" LeafNode [Extension] where
   getField = (.tbs.extensions)
@@ -110,3 +113,13 @@ data LeafNodeSourceTag
 
 instance Bounded LeafNodeSourceTag => ParseMLS LeafNodeSourceTag where
   parseMLS = parseMLSEnum @Word8 "leaf node source"
+
+instance HasField "name" LeafNodeSourceTag Text where
+  getField LeafNodeSourceKeyPackageTag = "key_package"
+  getField LeafNodeSourceUpdateTag = "update"
+  getField LeafNodeSourceCommitTag = "commit"
+
+leafNodeSourceTag :: LeafNodeSource -> LeafNodeSourceTag
+leafNodeSourceTag (LeafNodeSourceKeyPackage _) = LeafNodeSourceKeyPackageTag
+leafNodeSourceTag LeafNodeSourceUpdate = LeafNodeSourceUpdateTag
+leafNodeSourceTag (LeafNodeSourceCommit _) = LeafNodeSourceCommitTag
