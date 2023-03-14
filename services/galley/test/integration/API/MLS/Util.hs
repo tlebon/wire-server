@@ -31,7 +31,6 @@ import Control.Monad.Catch
 import Control.Monad.State (StateT, evalStateT)
 import qualified Control.Monad.State as State
 import Control.Monad.Trans.Maybe
-import Crypto.PubKey.Ed25519
 import Data.Aeson.Lens
 import Data.Binary.Builder (toLazyByteString)
 import qualified Data.ByteArray as BA
@@ -78,7 +77,6 @@ import Wire.API.MLS.GroupInfoBundle
 import Wire.API.MLS.KeyPackage
 import Wire.API.MLS.Keys
 import Wire.API.MLS.Message
-import Wire.API.MLS.Proposal
 import Wire.API.MLS.Serialisation
 import Wire.API.MLS.SubConversation
 import Wire.API.User.Client
@@ -123,7 +121,7 @@ postMessage sender msg = do
         . zUser (ciUser sender)
         . zClient (ciClient sender)
         . zConn "conn"
-        . content "message/mls"
+        . Bilge.content "message/mls"
         . bytes msg
     )
 
@@ -144,7 +142,7 @@ localPostCommitBundle sender bundle = do
         . zUser (ciUser sender)
         . zClient (ciClient sender)
         . zConn "conn"
-        . content "application/x-protobuf"
+        . Bilge.content "application/x-protobuf"
         . bytes bundle
     )
 
@@ -217,31 +215,9 @@ postWelcome uid welcome = do
         . paths ["v2", "mls", "welcome"]
         . zUser uid
         . zConn "conn"
-        . content "message/mls"
+        . Bilge.content "message/mls"
         . bytes welcome
     )
-
-mkAppAckProposalMessage ::
-  GroupId ->
-  Epoch ->
-  KeyPackageRef ->
-  [MessageRange] ->
-  SecretKey ->
-  PublicKey ->
-  Message 'MLSPlainText
-mkAppAckProposalMessage gid epoch ref mrs priv pub = do
-  let tbs =
-        mkRawMLS $
-          MessageTBS
-            { tbsMsgFormat = KnownFormatTag,
-              tbsMsgGroupId = gid,
-              tbsMsgEpoch = epoch,
-              tbsMsgAuthData = mempty,
-              tbsMsgSender = MemberSender ref,
-              tbsMsgPayload = ProposalMessage (mkAppAckProposal mrs)
-            }
-      sig = BA.convert $ sign priv pub (rmRaw tbs)
-   in Message tbs (MessageExtraFields sig Nothing Nothing)
 
 saveRemovalKey :: FilePath -> TestM ()
 saveRemovalKey fp = do
