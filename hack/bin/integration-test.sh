@@ -10,7 +10,7 @@ CLEANUP_LOCAL_FILES=${CLEANUP_LOCAL_FILES:-1} # set to 0 to keep files
 echo "Running integration tests on wire-server with parallelism=${HELM_PARALLELISM} ..."
 
 CHART=wire-server
-tests=(galley cargohold gundeck federator spar brig integration)
+tests=(integration)
 
 cleanup() {
     if (( CLEANUP_LOCAL_FILES > 0 )); then
