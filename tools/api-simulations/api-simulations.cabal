@@ -20,40 +20,20 @@ library
   default-extensions:
     NoImplicitPrelude
     AllowAmbiguousTypes
-    BangPatterns
-    ConstraintKinds
     DataKinds
     DefaultSignatures
-    DeriveFunctor
-    DeriveGeneric
-    DeriveLift
-    DeriveTraversable
     DerivingStrategies
     DerivingVia
-    EmptyCase
-    FlexibleContexts
-    FlexibleInstances
     FunctionalDependencies
     GADTs
-    InstanceSigs
-    KindSignatures
     LambdaCase
-    MultiParamTypeClasses
     MultiWayIf
-    NamedFieldPuns
     OverloadedStrings
     PackageImports
     PatternSynonyms
-    PolyKinds
     QuasiQuotes
-    RankNTypes
-    ScopedTypeVariables
-    StandaloneDeriving
-    TupleSections
-    TypeApplications
     TypeFamilies
     TypeFamilyDependencies
-    TypeOperators
     UndecidableInstances
     ViewPatterns
 
@@ -76,7 +56,7 @@ library
     , text                   >=0.11
     , types-common           >=0.4.7
 
-  default-language:   Haskell2010
+  default-language:   GHC2021
 
 executable api-loadtest
   main-is:            Main.hs
@@ -88,40 +68,20 @@ executable api-loadtest
   default-extensions:
     NoImplicitPrelude
     AllowAmbiguousTypes
-    BangPatterns
-    ConstraintKinds
     DataKinds
     DefaultSignatures
-    DeriveFunctor
-    DeriveGeneric
-    DeriveLift
-    DeriveTraversable
     DerivingStrategies
     DerivingVia
-    EmptyCase
-    FlexibleContexts
-    FlexibleInstances
     FunctionalDependencies
     GADTs
-    InstanceSigs
-    KindSignatures
     LambdaCase
-    MultiParamTypeClasses
     MultiWayIf
-    NamedFieldPuns
     OverloadedStrings
     PackageImports
     PatternSynonyms
-    PolyKinds
     QuasiQuotes
-    RankNTypes
-    ScopedTypeVariables
-    StandaloneDeriving
-    TupleSections
-    TypeApplications
     TypeFamilies
     TypeFamilyDependencies
-    TypeOperators
     UndecidableInstances
     ViewPatterns
 
@@ -152,7 +112,7 @@ executable api-loadtest
     , unliftio               >=0.2.10
     , uuid                   >=1.3
 
-  default-language:   Haskell2010
+  default-language:   GHC2021
 
 executable api-smoketest
   main-is:            Main.hs
@@ -164,40 +124,20 @@ executable api-smoketest
   default-extensions:
     NoImplicitPrelude
     AllowAmbiguousTypes
-    BangPatterns
-    ConstraintKinds
     DataKinds
     DefaultSignatures
-    DeriveFunctor
-    DeriveGeneric
-    DeriveLift
-    DeriveTraversable
     DerivingStrategies
     DerivingVia
-    EmptyCase
-    FlexibleContexts
-    FlexibleInstances
     FunctionalDependencies
     GADTs
-    InstanceSigs
-    KindSignatures
     LambdaCase
-    MultiParamTypeClasses
     MultiWayIf
-    NamedFieldPuns
     OverloadedStrings
     PackageImports
     PatternSynonyms
-    PolyKinds
     QuasiQuotes
-    RankNTypes
-    ScopedTypeVariables
-    StandaloneDeriving
-    TupleSections
-    TypeApplications
     TypeFamilies
     TypeFamilyDependencies
-    TypeOperators
     UndecidableInstances
     ViewPatterns
 
@@ -226,4 +166,4 @@ executable api-smoketest
     , types-common           >=0.11
     , unliftio
 
-  default-language:   Haskell2010
+  default-language:   GHC2021

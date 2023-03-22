@@ -18,40 +18,20 @@ library
   default-extensions:
     NoImplicitPrelude
     AllowAmbiguousTypes
-    BangPatterns
-    ConstraintKinds
     DataKinds
     DefaultSignatures
-    DeriveFunctor
-    DeriveGeneric
-    DeriveLift
-    DeriveTraversable
     DerivingStrategies
     DerivingVia
-    EmptyCase
-    FlexibleContexts
-    FlexibleInstances
     FunctionalDependencies
     GADTs
-    InstanceSigs
-    KindSignatures
     LambdaCase
-    MultiParamTypeClasses
     MultiWayIf
-    NamedFieldPuns
     OverloadedStrings
     PackageImports
     PatternSynonyms
-    PolyKinds
     QuasiQuotes
-    RankNTypes
-    ScopedTypeVariables
-    StandaloneDeriving
-    TupleSections
-    TypeApplications
     TypeFamilies
     TypeFamilyDependencies
-    TypeOperators
     UndecidableInstances
     ViewPatterns
 
@@ -72,7 +52,7 @@ library
     , transformers
     , unliftio
 
-  default-language:   Haskell2010
+  default-language:   GHC2021
   other-extensions:   ForeignFunctionInterface
   extra-libraries:
     rusty_jwt_tools_ffi
@@ -99,7 +79,7 @@ test-suite jwt-tools-tests
     , uuid
 
   hs-source-dirs:     test
-  default-language:   Haskell2010
+  default-language:   GHC2021
   ghc-options:
     -O2 -Wall -Wincomplete-uni-patterns -Wincomplete-record-updates
     -Wpartial-fields -fwarn-tabs -optP-Wno-nonportable-include-path
@@ -108,39 +88,19 @@ test-suite jwt-tools-tests
   default-extensions:
     NoImplicitPrelude
     AllowAmbiguousTypes
-    BangPatterns
-    ConstraintKinds
     DataKinds
     DefaultSignatures
-    DeriveFunctor
-    DeriveGeneric
-    DeriveLift
-    DeriveTraversable
     DerivingStrategies
     DerivingVia
-    EmptyCase
-    FlexibleContexts
-    FlexibleInstances
     FunctionalDependencies
     GADTs
-    InstanceSigs
-    KindSignatures
     LambdaCase
-    MultiParamTypeClasses
     MultiWayIf
-    NamedFieldPuns
     OverloadedStrings
     PackageImports
     PatternSynonyms
-    PolyKinds
     QuasiQuotes
-    RankNTypes
-    ScopedTypeVariables
-    StandaloneDeriving
-    TupleSections
-    TypeApplications
     TypeFamilies
     TypeFamilyDependencies
-    TypeOperators
     UndecidableInstances
     ViewPatterns

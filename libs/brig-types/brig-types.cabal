@@ -30,40 +30,20 @@ library
   default-extensions:
     NoImplicitPrelude
     AllowAmbiguousTypes
-    BangPatterns
-    ConstraintKinds
     DataKinds
     DefaultSignatures
-    DeriveFunctor
-    DeriveGeneric
-    DeriveLift
-    DeriveTraversable
     DerivingStrategies
     DerivingVia
-    EmptyCase
-    FlexibleContexts
-    FlexibleInstances
     FunctionalDependencies
     GADTs
-    InstanceSigs
-    KindSignatures
     LambdaCase
-    MultiParamTypeClasses
     MultiWayIf
-    NamedFieldPuns
     OverloadedStrings
     PackageImports
     PatternSynonyms
-    PolyKinds
     QuasiQuotes
-    RankNTypes
-    ScopedTypeVariables
-    StandaloneDeriving
-    TupleSections
-    TypeApplications
     TypeFamilies
     TypeFamilyDependencies
-    TypeOperators
     UndecidableInstances
     ViewPatterns
 
@@ -95,7 +75,7 @@ library
     , unordered-containers   >=0.2
     , wire-api
 
-  default-language:   Haskell2010
+  default-language:   GHC2021
 
 test-suite brig-types-tests
   type:               exitcode-stdio-1.0
@@ -111,40 +91,20 @@ test-suite brig-types-tests
   default-extensions:
     NoImplicitPrelude
     AllowAmbiguousTypes
-    BangPatterns
-    ConstraintKinds
     DataKinds
     DefaultSignatures
-    DeriveFunctor
-    DeriveGeneric
-    DeriveLift
-    DeriveTraversable
     DerivingStrategies
     DerivingVia
-    EmptyCase
-    FlexibleContexts
-    FlexibleInstances
     FunctionalDependencies
     GADTs
-    InstanceSigs
-    KindSignatures
     LambdaCase
-    MultiParamTypeClasses
     MultiWayIf
-    NamedFieldPuns
     OverloadedStrings
     PackageImports
     PatternSynonyms
-    PolyKinds
     QuasiQuotes
-    RankNTypes
-    ScopedTypeVariables
-    StandaloneDeriving
-    TupleSections
-    TypeApplications
     TypeFamilies
     TypeFamilyDependencies
-    TypeOperators
     UndecidableInstances
     ViewPatterns
 
@@ -174,4 +134,4 @@ test-suite brig-types-tests
     , unordered-containers   >=0.2
     , wire-api
 
-  default-language:   Haskell2010
+  default-language:   GHC2021

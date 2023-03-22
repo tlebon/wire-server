@@ -22,40 +22,20 @@ executable migrate-sso-feature-flag
   default-extensions:
     NoImplicitPrelude
     AllowAmbiguousTypes
-    BangPatterns
-    ConstraintKinds
     DataKinds
     DefaultSignatures
-    DeriveFunctor
-    DeriveGeneric
-    DeriveLift
-    DeriveTraversable
     DerivingStrategies
     DerivingVia
-    EmptyCase
-    FlexibleContexts
-    FlexibleInstances
     FunctionalDependencies
     GADTs
-    InstanceSigs
-    KindSignatures
     LambdaCase
-    MultiParamTypeClasses
     MultiWayIf
-    NamedFieldPuns
     OverloadedStrings
     PackageImports
     PatternSynonyms
-    PolyKinds
     QuasiQuotes
-    RankNTypes
-    ScopedTypeVariables
-    StandaloneDeriving
-    TupleSections
-    TypeApplications
     TypeFamilies
     TypeFamilyDependencies
-    TypeOperators
     UndecidableInstances
     ViewPatterns
 
@@ -79,4 +59,4 @@ executable migrate-sso-feature-flag
     , unliftio
     , wire-api
 
-  default-language:   Haskell2010
+  default-language:   GHC2021

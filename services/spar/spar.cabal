@@ -82,40 +82,20 @@ library
   default-extensions:
     NoImplicitPrelude
     AllowAmbiguousTypes
-    BangPatterns
-    ConstraintKinds
     DataKinds
     DefaultSignatures
-    DeriveFunctor
-    DeriveGeneric
-    DeriveLift
-    DeriveTraversable
     DerivingStrategies
     DerivingVia
-    EmptyCase
-    FlexibleContexts
-    FlexibleInstances
     FunctionalDependencies
     GADTs
-    InstanceSigs
-    KindSignatures
     LambdaCase
-    MultiParamTypeClasses
     MultiWayIf
-    NamedFieldPuns
     OverloadedStrings
     PackageImports
     PatternSynonyms
-    PolyKinds
     QuasiQuotes
-    RankNTypes
-    ScopedTypeVariables
-    StandaloneDeriving
-    TupleSections
-    TypeApplications
     TypeFamilies
     TypeFamilyDependencies
-    TypeOperators
     UndecidableInstances
     ViewPatterns
 
@@ -192,7 +172,7 @@ library
     , xml-conduit
     , yaml
 
-  default-language:   Haskell2010
+  default-language:   GHC2021
 
 executable spar
   main-is:            Main.hs
@@ -201,40 +181,20 @@ executable spar
   default-extensions:
     NoImplicitPrelude
     AllowAmbiguousTypes
-    BangPatterns
-    ConstraintKinds
     DataKinds
     DefaultSignatures
-    DeriveFunctor
-    DeriveGeneric
-    DeriveLift
-    DeriveTraversable
     DerivingStrategies
     DerivingVia
-    EmptyCase
-    FlexibleContexts
-    FlexibleInstances
     FunctionalDependencies
     GADTs
-    InstanceSigs
-    KindSignatures
     LambdaCase
-    MultiParamTypeClasses
     MultiWayIf
-    NamedFieldPuns
     OverloadedStrings
     PackageImports
     PatternSynonyms
-    PolyKinds
     QuasiQuotes
-    RankNTypes
-    ScopedTypeVariables
-    StandaloneDeriving
-    TupleSections
-    TypeApplications
     TypeFamilies
     TypeFamilyDependencies
-    TypeOperators
     UndecidableInstances
     ViewPatterns
 
@@ -313,7 +273,7 @@ executable spar
     , xml-conduit
     , yaml
 
-  default-language:   Haskell2010
+  default-language:   GHC2021
 
 executable spar-integration
   main-is:            Main.hs
@@ -340,40 +300,20 @@ executable spar-integration
   default-extensions:
     NoImplicitPrelude
     AllowAmbiguousTypes
-    BangPatterns
-    ConstraintKinds
     DataKinds
     DefaultSignatures
-    DeriveFunctor
-    DeriveGeneric
-    DeriveLift
-    DeriveTraversable
     DerivingStrategies
     DerivingVia
-    EmptyCase
-    FlexibleContexts
-    FlexibleInstances
     FunctionalDependencies
     GADTs
-    InstanceSigs
-    KindSignatures
     LambdaCase
-    MultiParamTypeClasses
     MultiWayIf
-    NamedFieldPuns
     OverloadedStrings
     PackageImports
     PatternSynonyms
-    PolyKinds
     QuasiQuotes
-    RankNTypes
-    ScopedTypeVariables
-    StandaloneDeriving
-    TupleSections
-    TypeApplications
     TypeFamilies
     TypeFamilyDependencies
-    TypeOperators
     UndecidableInstances
     ViewPatterns
 
@@ -464,7 +404,7 @@ executable spar-integration
     , yaml
     , zauth
 
-  default-language:   Haskell2010
+  default-language:   GHC2021
 
 executable spar-migrate-data
   main-is:            Main.hs
@@ -480,40 +420,20 @@ executable spar-migrate-data
   default-extensions:
     NoImplicitPrelude
     AllowAmbiguousTypes
-    BangPatterns
-    ConstraintKinds
     DataKinds
     DefaultSignatures
-    DeriveFunctor
-    DeriveGeneric
-    DeriveLift
-    DeriveTraversable
     DerivingStrategies
     DerivingVia
-    EmptyCase
-    FlexibleContexts
-    FlexibleInstances
     FunctionalDependencies
     GADTs
-    InstanceSigs
-    KindSignatures
     LambdaCase
-    MultiParamTypeClasses
     MultiWayIf
-    NamedFieldPuns
     OverloadedStrings
     PackageImports
     PatternSynonyms
-    PolyKinds
     QuasiQuotes
-    RankNTypes
-    ScopedTypeVariables
-    StandaloneDeriving
-    TupleSections
-    TypeApplications
     TypeFamilies
     TypeFamilyDependencies
-    TypeOperators
     UndecidableInstances
     ViewPatterns
 
@@ -593,7 +513,7 @@ executable spar-migrate-data
     , xml-conduit
     , yaml
 
-  default-language:   Haskell2010
+  default-language:   GHC2021
 
 executable spar-schema
   main-is:            spar-schema.hs
@@ -624,40 +544,20 @@ executable spar-schema
   default-extensions:
     NoImplicitPrelude
     AllowAmbiguousTypes
-    BangPatterns
-    ConstraintKinds
     DataKinds
     DefaultSignatures
-    DeriveFunctor
-    DeriveGeneric
-    DeriveLift
-    DeriveTraversable
     DerivingStrategies
     DerivingVia
-    EmptyCase
-    FlexibleContexts
-    FlexibleInstances
     FunctionalDependencies
     GADTs
-    InstanceSigs
-    KindSignatures
     LambdaCase
-    MultiParamTypeClasses
     MultiWayIf
-    NamedFieldPuns
     OverloadedStrings
     PackageImports
     PatternSynonyms
-    PolyKinds
     QuasiQuotes
-    RankNTypes
-    ScopedTypeVariables
-    StandaloneDeriving
-    TupleSections
-    TypeApplications
     TypeFamilies
     TypeFamilyDependencies
-    TypeOperators
     UndecidableInstances
     ViewPatterns
 
@@ -736,7 +636,7 @@ executable spar-schema
     , xml-conduit
     , yaml
 
-  default-language:   Haskell2010
+  default-language:   GHC2021
 
 test-suite spec
   type:               exitcode-stdio-1.0
@@ -760,40 +660,20 @@ test-suite spec
   default-extensions:
     NoImplicitPrelude
     AllowAmbiguousTypes
-    BangPatterns
-    ConstraintKinds
     DataKinds
     DefaultSignatures
-    DeriveFunctor
-    DeriveGeneric
-    DeriveLift
-    DeriveTraversable
     DerivingStrategies
     DerivingVia
-    EmptyCase
-    FlexibleContexts
-    FlexibleInstances
     FunctionalDependencies
     GADTs
-    InstanceSigs
-    KindSignatures
     LambdaCase
-    MultiParamTypeClasses
     MultiWayIf
-    NamedFieldPuns
     OverloadedStrings
     PackageImports
     PatternSynonyms
-    PolyKinds
     QuasiQuotes
-    RankNTypes
-    ScopedTypeVariables
-    StandaloneDeriving
-    TupleSections
-    TypeApplications
     TypeFamilies
     TypeFamilyDependencies
-    TypeOperators
     UndecidableInstances
     ViewPatterns
 
@@ -874,4 +754,4 @@ test-suite spec
     , xml-conduit
     , yaml
 
-  default-language:   Haskell2010
+  default-language:   GHC2021
