@@ -80,10 +80,11 @@ validateKeyPackage identity (RawMLS (KeyPackageData -> kpd) kp) = do
 
   -- validate signature
   unless
-    ( csVerifySignature
+    ( csVerifySignatureWithLabel
         cs
         kp.leafNode.signatureKey
-        kp.tbs.rmRaw
+        "KeyPackageTBS"
+        kp.tbs
         kp.signature_
     )
     $ mlsProtocolError "Invalid signature"
@@ -94,7 +95,7 @@ validateKeyPackage identity (RawMLS (KeyPackageData -> kpd) kp) = do
     (pvTag (kp.protocolVersion) >>= guard . (== ProtocolMLS10))
 
   -- validate credential, lifetime and capabilities
-  validateCredential identity kp.credential
+  validateCredential identity kp.leafNode.credential
   validateSource kp.leafNode.source
   validateCapabilities kp.leafNode.capabilities
 
