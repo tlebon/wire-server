@@ -111,4 +111,4 @@ executeFederatedStreaming remote c = do
     SourceT $ \k ->
       runCodensity
         (runFederatorClientToCodensity @'Cargohold env c)
-        (either (throw . federationErrorToWai . FederationCallFailure) (flip unSourceT k))
+        (either (throw . federationErrorToWai . FederationCallFailure) (\s -> unSourceT s k))

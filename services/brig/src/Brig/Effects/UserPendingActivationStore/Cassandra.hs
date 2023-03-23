@@ -10,7 +10,7 @@ import Data.Time (UTCTime)
 import Imports
 import Polysemy
 import Polysemy.Internal.Tactics
-import qualified Wire.Sem.Paging.Cassandra as PC
+import Wire.Sem.Paging.Cassandra qualified as PC
 
 userPendingActivationStoreToCassandra ::
   forall r a.

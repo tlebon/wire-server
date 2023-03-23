@@ -27,7 +27,7 @@ import Polysemy.Input
 import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck
-import qualified Wire.Sem.Now as E
+import Wire.Sem.Now qualified as E
 
 propsForInterpreter ::
   PropConstraints r f =>
@@ -52,7 +52,7 @@ instance
 prop_nowNow ::
   PropConstraints r f =>
   Maybe (f Bool -> String) ->
-  (forall a. Sem r a -> IO (f a)) ->
+  (forall z. Sem r (Bool, z) -> IO (f (Bool, z))) ->
   Property
 prop_nowNow =
   -- NOTE: This @Input ()@ effect is a workaround to an oversight in
@@ -65,5 +65,4 @@ prop_nowNow =
     pure $
       simpleLaw
         (liftA2 (<=) E.get E.get)
-        ( pure True
-        )
+        (pure True)
