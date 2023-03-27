@@ -590,6 +590,7 @@ executable galley-schema
     V78_TeamFeatureOutlookCalIntegration
     V79_TeamFeatureMlsE2EId
     V80_MLSSubconversation
+    V81_MLSDraft17
 
   hs-source-dirs:     schema/src
   default-extensions: TemplateHaskell

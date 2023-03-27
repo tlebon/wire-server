@@ -41,7 +41,6 @@ import Data.Time
 import qualified Data.UUID.Tagged as U
 import Galley.API.Error
 import Galley.API.MLS
-import Galley.API.MLS.KeyPackage (nullKeyPackageRef)
 import Galley.API.MLS.Keys (getMLSRemovalKey)
 import Galley.API.Mapping
 import Galley.API.One2One
@@ -86,7 +85,6 @@ import Wire.API.Team.Permission hiding (self)
 createGroupConversation ::
   ( Member BrigAccess r,
     Member ConversationStore r,
-    Member MemberStore r,
     Member (ErrorS 'ConvAccessDenied) r,
     Member (Error InternalError) r,
     Member (Error InvalidInput) r,
@@ -95,7 +93,6 @@ createGroupConversation ::
     Member (ErrorS 'NotConnected) r,
     Member (ErrorS 'MLSNotEnabled) r,
     Member (ErrorS 'MLSNonEmptyMemberList) r,
-    Member (ErrorS 'MLSMissingSenderClient) r,
     Member (ErrorS 'MissingLegalholdConsent) r,
     Member FederatorAccess r,
     Member GundeckAccess r,
@@ -107,11 +104,10 @@ createGroupConversation ::
     Member P.TinyLog r
   ) =>
   Local UserId ->
-  Maybe ClientId ->
   Maybe ConnId ->
   NewConv ->
   Sem r ConversationResponse
-createGroupConversation lusr mCreatorClient mConn newConv = do
+createGroupConversation lusr mConn newConv = do
   (nc, fromConvSize -> allUsers) <- newRegularConversation lusr newConv
   let tinfo = newConvTeam newConv
   checkCreateConvPermissions lusr newConv tinfo allUsers
@@ -131,13 +127,6 @@ createGroupConversation lusr mCreatorClient mConn newConv = do
   -- conversation to the database, and throw a validation error when the
   -- conversation is already in the database.
   conv <- E.createConversation lcnv nc
-
-  -- set creator client for MLS conversations
-  case (convProtocol conv, mCreatorClient) of
-    (ProtocolProteus, _) -> pure ()
-    (ProtocolMLS mlsMeta, Just c) ->
-      E.addMLSClients (cnvmlsGroupId mlsMeta) (tUntagged lusr) (Set.singleton (c, nullKeyPackageRef))
-    (ProtocolMLS _mlsMeta, Nothing) -> throwS @'MLSMissingSenderClient
 
   now <- input
   -- NOTE: We only send (conversation) events to members of the conversation
